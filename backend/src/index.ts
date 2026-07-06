@@ -7,11 +7,18 @@ import productRoute from "./routes/productRoute";
 import cartRoute from "./routes/cartRoute";
 import { seedInitialProducts } from "./services/productService";
 import cors from "cors";
+import path from "path";
 
 dotenv.config();
 
 const app = express();
 const port = 3001;
+const __dirname = path.resolve();
+
+if (process.env.NODE_ENV !== "production") { 
+  app.use(cors({ origin: "http://localhost:5173" }));
+}
+
 
 app.use(express.json());
 app.use(cors());
@@ -19,6 +26,24 @@ app.use(cors());
 app.use("/user", userRoute);
 app.use("/product", productRoute);
 app.use("/cart", cartRoute);
+
+
+
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../frontend2/build")));
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.join(__dirname, "../frontend2/build", "index.html"));
+//   });
+// }  
+
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend2/dist")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend2", "dist", "index.html"));
+  });
+}
 
 const startServer = async () => {
   try {
